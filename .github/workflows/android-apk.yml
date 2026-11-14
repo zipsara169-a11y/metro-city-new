@@ -1,3 +1,4 @@
+
 name: Build Android APK
 
 on:
@@ -42,6 +43,21 @@ jobs:
           use_preset_export_path: true
           presets_to_export: Android
           cache: true
+
+      - name: Copy APK to build folder
+        run: |
+          mkdir -p build
+          APK_PATH="$HOME/.local/share/godot/builds/Android/MetroCity.apk"
+
+          if [ ! -f "$APK_PATH" ]; then
+            echo "APK file not found!"
+            echo "Searching for exported APK..."
+            find "$HOME/.local/share/godot/builds" -type f -name "*.apk"
+            exit 1
+          fi
+
+          cp "$APK_PATH" build/MetroCity.apk
+          ls -lh build/MetroCity.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
