@@ -6,6 +6,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -14,28 +17,35 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Godot
-        uses: chickensoft-games/setup-godot@v2
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
-          version: 4.3.0
-          use-dotnet: false
+          distribution: temurin
+          java-version: '17'
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools'
 
-      - name: Install Android build templates
+      - name: Install Android packages
         run: |
-          mkdir -p ~/.config/godot
-          godot --headless --editor --path . --quit
+          sdkmanager "platforms;android-34" "build-tools;34.0.0"
 
-      - name: Export APK
-        run: |
-          godot --headless --path . \
-          --export-debug "Android" MetroCity.apk
+      - name: Setup Godot and Export APK
+        uses: firebelley/godot-export@v8.0.0
+        with:
+          godot_executable_download_url: https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip
+          godot_export_templates_download_url: https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_export_templates.tpz
+          relative_project_path: ./
+          export_debug: true
+          use_preset_export_path: true
+          presets_to_export: Android
+          cache: true
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: MetroCity-Android-APK
-          path: MetroCity.apk
+          path: build/MetroCity.apk
           if-no-files-found: error
