@@ -1,0 +1,41 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Godot
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: 4.3.0
+          use-dotnet: false
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android build templates
+        run: |
+          mkdir -p ~/.config/godot
+          godot --headless --editor --path . --quit
+
+      - name: Export APK
+        run: |
+          godot --headless --path . \
+          --export-debug "Android" MetroCity.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MetroCity-Android-APK
+          path: MetroCity.apk
+          if-no-files-found: error
