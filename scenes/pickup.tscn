@@ -1,0 +1,38 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/pickup.gd" id="1_pickup"]
+
+[sub_resource type="SphereShape3D" id="SphereShape_pickup"]
+radius = 1.35
+
+[sub_resource type="SphereMesh" id="SphereMesh_pickup"]
+radius = 0.42
+height = 0.84
+
+[sub_resource type="TorusMesh" id="TorusMesh_pickup"]
+inner_radius = 0.055
+outer_radius = 0.78
+rings = 24
+ring_segments = 12
+
+[node name="EnergyCore" type="Area3D"]
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("1_pickup")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape_pickup")
+
+[node name="CoreVisual" type="Node3D" parent="."]
+
+[node name="Orb" type="MeshInstance3D" parent="CoreVisual"]
+mesh = SubResource("SphereMesh_pickup")
+
+[node name="Ring" type="MeshInstance3D" parent="CoreVisual"]
+mesh = SubResource("TorusMesh_pickup")
+rotation = Vector3(0.85, 0, 0.35)
+
+[node name="Glow" type="OmniLight3D" parent="CoreVisual"]
+light_color = Color(0.15, 0.85, 1, 1)
+light_energy = 1.8
+omni_range = 5.0
